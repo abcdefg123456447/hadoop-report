@@ -5,11 +5,43 @@
     <title>大数据平台安装配置报告</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
-        .container { max-width: 900px; margin: 0 auto; }
-        h1, h2 { color: #333; }
-        img { max-width: 100%; border: 1px solid #ddd; margin: 10px 0; }
-        pre { background-color: #f4f4f4; padding: 15px; border: 1px solid #ddd; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"; margin: 40px; line-height: 1.6; background-color: #f6f8fa; }
+        .container { max-width: 900px; margin: 0 auto; background-color: #ffffff; border: 1px solid #d0d7de; border-radius: 6px; padding: 24px; }
+        h1, h2, h3 { color: #1f2328; border-bottom: 1px solid #d8dee4; padding-bottom: 8px; }
+        img { max-width: 100%; border: 1px solid #d0d7de; margin: 10px 0; border-radius: 6px; }
+        
+        /* 模拟终端样式 */
+        #terminal {
+            background-color: #161b22;
+            color: #c9d1d9;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #30363d;
+            white-space: pre-wrap; /* 允许换行 */
+            word-wrap: break-word;
+        }
+        
+        /* 动态 "运行" 按钮样式 */
+        #runButton {
+            background-color: #238636;
+            color: #ffffff;
+            border: 1px solid rgba(240, 246, 252, 0.1);
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #runButton:hover { background-color: #2ea043; }
+        #runButton:disabled { background-color: #57606a; cursor: not-allowed; }
+
+        /* 结果容器，默认隐藏 */
+        #resultsContainer { display: none; }
+        
         .chart-container { width: 80%; margin: 20px auto; }
     </style>
 </head>
@@ -19,36 +51,45 @@
         <p><strong>学生:</strong> 郭嘉汀 <strong>学号:</strong> 23281205</p>
 
         <h2>1. 平台概述</h2>
-        <p>本项目成功在 Windows 11 (WSL2 Ubuntu) 环境下，搭建了 Hadoop 3.3.6 伪分布式集群，并安装了 Zookeeper 3.8.4。
-           Hadoop 集群运行正常，HDFS 和 YARN 均可访问。</p>
+        <p>本项目成功在 Windows 11 (WSL2 Ubuntu) 环境下，搭建了 Hadoop 3.3.6 伪分布式集群，并安装了 Zookeeper 3.8.4。Hadoop 集群运行正常，HDFS 和 YARN 均可访问。</p>
         
-        <h2>2. 平台监控 (作业第4项)</h2>
+        <h2>2. 平台监控 (静态证据)</h2>
         <p>Hadoop 集群的 Web 监控界面运行正常。</p>
         <h3>HDFS (NameNode) 监控 (localhost:9870)</h3>
         <img src="hdfs.png" alt="HDFS 监控截图">
         <h3>YARN (ResourceManager) 监控 (localhost:8088)</h3>
         <img src="yarn.png" alt="YARN 监控截图">
 
-        <h2>3. 核心进程验证</h2>
-        <p>通过 <code>jps</code> 命令可以看到，Hadoop (NameNode, DataNode, SecondaryNameNode, ResourceManager, NodeManager) 
-           和 Zookeeper (QuorumPeerMain) 的所有核心进程均已成功启动。</p>
+        <h2>3. 核心进程验证 (静态证据)</h2>
+        <p>通过 <code>jps</code> 命令可以看到，Hadoop 和 Zookeeper 的所有核心进程均已成功启动。</p>
         <img src="jps.png" alt="JPS 进程截图">
 
-        <h2>4. 数据分析与可视化 (WordCount)</h2>
-        <p>为了演示数据分析能力，我们运行了经典的 WordCount (词频统计) MapReduce 作业。</p>
-        <h3>4.1 分析结果</h3>
-        <p>作业成功完成，从 HDFS 的 <code>/output/part-r-00000</code> 文件中读取的结果如下：</p>
-        <img src="result.png" alt="WordCount 结果截图">
+        <hr>
 
-        <h3>4.2 数据可视化</h3>
-        <p>以下是根据 WordCount 结果生成的可视化条形图：</p>
-        <div class="chart-container">
-            <canvas id="wordCountChart"></canvas>
+        <h2>4. 动态数据分析 (WordCount 模拟)</h2>
+        <p>为了动态演示数据分析能力，我们来模拟运行经典的 WordCount (词频统计) MapReduce 作业。请点击下方按钮启动作业：</p>
+        
+        <button id="runButton">► 运行 WordCount 作业</button>
+        
+        <br><br>
+        
+        <pre id="terminal" style="display: none;"></pre>
+        
+        <div id="resultsContainer">
+            <h3>4.1 分析结果</h3>
+            <p>作业成功完成！从 HDFS 的 <code>/output/part-r-00000</code> 文件中读取的结果如下：</p>
+            <img src="result.png" alt="WordCount 结果截图">
+
+            <h3>4.2 数据可视化</h3>
+            <p>以下是根据 WordCount 结果生成的可视化条形图：</p>
+            <div class="chart-container">
+                <canvas id="wordCountChart"></canvas>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- 你的数据 ---
+        // --- 你的 WordCount 数据 (确认无误) ---
         const wordData = {
             "Big": 1,
             "Data": 1,
@@ -60,32 +101,104 @@
             "is": 1,
             "to": 1
         };
-        // -----------------
+        
+        // --- 模拟的 MapReduce 日志 ---
+        // (基于你 image_d39fa4.jpg 的日志)
+        const logLines = [
+            "$ hadoop jar ~/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.3.6.jar wordcount /input /output",
+            "2025-10-20 00:05:35,178 INFO client.DefaultNoHARMFailoverProxyProvider: Connecting to HDFS namenode...",
+            "2025-10-20 00:05:36,490 INFO mapreduce.JobSubmitter: number of splits:1",
+            "2025-10-20 00:05:37,120 INFO mapreduce.Job: The url to track the job: http://localhost:8088/proxy/application_167...",
+            "2025-10-20 00:05:37,122 INFO mapreduce.Job: Running job: job_167..._0001",
+            "2025-10-20 00:05:45,301 INFO mapreduce.Job: Job job_167..._0001 running in uber mode : false",
+            "2025-10-20 00:05:45,303 INFO mapreduce.Job:  map 0% reduce 0%",
+            "2025-10-20 00:05:52,510 INFO mapreduce.Job:  map 100% reduce 0%",
+            "2025-10-20 00:05:58,730 INFO mapreduce.Job:  map 100% reduce 100%",
+            "2025-10-20 00:05:58,934 INFO mapreduce.Job: Job job_167..._0001 completed successfully",
+            "2025-10-20 00:05:59,431 INFO mapreduce.Job: Counters: 54",
+            "    File System Counters",
+            "        FILE: Number of bytes read=107",
+            "        FILE: Number of bytes written=55157",
+            "        HDFS: Number of bytes read=107",
+            "        HDFS: Number of bytes written=65",
+            "    Job Counters",
+            "        Launched map tasks=1",
+            "        Launched reduce tasks=1",
+            "    Map-Reduce Framework",
+            "        Map input records=2",
+            "        Map output records=9",
+            "        Reduce input records=9",
+            "        Reduce output records=8",
+            "    File Output Format Counters",
+            "        Bytes Written=65",
+            "",
+            "Job Completed Successfully!",
+            " "
+        ];
 
-        const ctx = document.getElementById('wordCountChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(wordData),
-                datasets: [{
-                    label: '单词频率',
-                    data: Object.values(wordData),
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
+        // --- 核心逻辑 ---
+        
+        const runButton = document.getElementById('runButton');
+        const terminalEl = document.getElementById('terminal');
+        const resultsEl = document.getElementById('resultsContainer');
+
+        // 把 Chart.js 的渲染封装成一个函数
+        function renderChart() {
+            const ctx = document.getElementById('wordCountChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(wordData),
+                    datasets: [{
+                        label: '单词频率',
+                        data: Object.values(wordData),
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
                         }
                     }
                 }
+            });
+        }
+        
+        // 模拟打字机效果
+        function typeLog(index) {
+            if (index < logLines.length) {
+                terminalEl.innerHTML += logLines[index] + '\n';
+                terminalEl.scrollTop = terminalEl.scrollHeight; // 自动滚动到底部
+                
+                // 当日志跑完时
+                if (index === logLines.length - 1) {
+                    setTimeout(showResults, 500); // 稍等半秒再显示结果
+                } else {
+                    // 模拟随机的打字延迟
+                    let delay = Math.random() * 150 + 50;
+                    if(logLines[index].includes("map 100%")) delay = 1000; // 在 map 100% 后多等一会
+                    setTimeout(() => typeLog(index + 1), delay);
+                }
             }
-        });
+        }
+        
+        // 显示最终结果
+        function showResults() {
+            resultsEl.style.display = 'block'; // 显示结果
+            renderChart(); // 渲染图表
+        }
+
+        // 按钮点击事件
+        runButton.onclick = function() {
+            runButton.disabled = true; // 禁用按钮
+            runButton.innerText = "作业运行中...";
+            terminalEl.style.display = 'block'; // 显示终端
+            typeLog(0); // 开始打印日志
+        }
     </script>
 </body>
 </html>
